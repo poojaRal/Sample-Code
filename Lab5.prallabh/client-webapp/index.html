@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="custom.css">
+    </head>
+    <body>
+        
+        <div class="container">
+            <form class="form-signin">
+                <h1>Survey Application</h1>
+                <h2 class="form-signin-heading">Please sign in</h2>
+                <label for="lblName" class="sr-only">Name</label>
+                <input id="lblName" class="form-control" placeholder="User name">
+                <br />
+                <input type="button" class="btn btn-lg btn-primary btn-block btnCheckUser" id="btnCheckUser" value="Survey"></input>
+                <input type="button" class="btn btn-lg btn-default btn-block btnMatch" id="btnMatch" value="Match"></input>
+            </form>
+        </div> <!-- /container -->
+            
+
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+        
+            var CheckUser = function(userName) {};
+            $(".btnMatch").click(function() {
+                var userName = $("#lblName").val();
+                window.location.replace("match.html?user=" + userName);
+            });
+            $(".btnCheckUser").click(function() {
+                var userName = $("#lblName").val();
+                var url = "http://localhost:8008/user/" + userName;
+
+                $.ajax({
+                    type: 'HEAD',
+                    url: url,
+                    complete: function(xhr) {
+                        if (xhr.status == '404') {
+                            //existing user -- open questions for that user
+                            $.post("http://localhost:8008/user/" + userName);
+                        }
+                        window.location.replace("questions.html?user=" + userName + "&qurl=http://localhost:8008/question?username=" + userName + "");
+                    }
+                });
+            });
+
+        </script>
+    </body>
+</html>

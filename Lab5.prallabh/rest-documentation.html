@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LAB 5 - REST Documenation</title>
+    <style type="text/css">
+    body{
+        font-family: 'Arial'; font-size: 16px;
+        padding: 50px 20px; line-height: 20px;
+    }
+
+    .wrapper{
+        max-width: 1400px; margin: 0 auto;
+    }
+
+    table{
+        width: 100%; border-spacing: 0;
+        border-collapse: separate;
+    }
+
+    th{
+        border: 1px solid #ddd;
+        border-bottom: 2px solid #ddd;
+        font-weight:bold; padding: 20px;
+        text-align: left;
+    }
+
+    td{
+        border: 1px solid #ddd; padding: 20px; vertical-align: top;
+    }
+
+    code{
+        background: #ffffd4; border-radius: 5px; padding: 2px 4px;
+    }
+
+    tr td:first-child{
+        max-width: 200px;
+    }
+
+    pre{
+        font-size: 13px; margin-bottom: 30px;
+        background: #fbfbd8; border-radius: 5px;
+        padding: 5px 10px;
+    }
+
+    h5{
+        margin-top: 0; margin-bottom: 5px;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+
+        <h2>LAB 5 - REST API overview (rbparekh &amp; prallabh)</h2>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Route
+                    <th>
+                        Request/ Response
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <code>GET</code> / <br>
+                        Root Endpoint. Get all the endpoints.
+                    </td>
+                    <td><h5>Request</h5>
+<pre>GET http://localhost:8008/</pre><h5>Response</h5>
+<pre>
+[
+    {
+        "method": "GET",
+        "url": "http://localhost:8008/question/{id}"
+    },
+    {
+        "method": "POST",
+        "url": "http://localhost:8008/question/{id}"
+    },
+    {
+        "method": "DELETE",
+        "url": "http://localhost:8008/question/{id}"
+    },
+    {
+        "method": "POST",
+        "url": "http://localhost:8008/user"
+    },
+    {
+        "method": "HEAD",
+        "url": "http://localhost:8008/user/{username}"
+    },
+    {
+        "method": "PUT",
+        "url": "http://localhost:8008/answer"
+    }
+]
+
+Content-Type -> application/json; charset=utf-8
+</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>GET</code> /question/:id <br>
+                        Get a survey question
+                    </td>
+                    <td><h5>Request</h5>
+<pre>GET localhost:8008/question</pre><h5>Response</h5>
+<pre>
+{
+    "question": {
+        "_id": "5533ba9f05b2cf8440218f8a",
+        "title": "What is your name?",
+        "options": [
+            {
+                "_id": "5533ba9f05b2cf8440218f87",
+                "title": "Lancelot"
+            },
+            {
+                "_id": "5533ba9f05b2cf8440218f88",
+                "title": "Arthur"
+            },
+            {
+                "_id": "5533ba9f05b2cf8440218f89",
+                "title": "Guineviere"
+            }
+        ]
+    },
+    "prev": null,
+    "next": "http://localhost:8008/question/5533ba9f05b2cf8440218f8e"
+} 
+
+Content-Type -> application/json; charset=utf-8
+</pre><br><br>
+<em>(optional paremeter) <strong>username</strong> - To get answers along with the questions/options for a particular user:</em>
+<pre>GET localhost:8008/question?username=rahul</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>POST</code> /question <br>
+                        Create a new Survey question
+                    </td>
+                    <td><h5>Request</h5>
+<pre>
+POST localhost:8008/question
+{
+  "title": "What is your favorite color?",
+  "options": [
+    {"title": "Blue"},
+    {"title":"Red"},
+    {"title":"I don't know!"}
+    ]
+}
+</pre><h5>Response</h5>
+<pre>
+{
+    "msg": "Question submitted successfully"
+}
+Content-Type -> application/json; charset=utf-8
+</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>HEAD</code> /user/:username <br>
+                        Check if a user exists or not
+                    </td>
+                    <td>
+<h5>Request</h5>
+<pre>HEAD http://localhost:8008/user/rahul</pre>
+<h5>Response:</h5>
+<pre>STATUS 200 OK</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>POST</code> /user/:username <br>
+                        Create a new user
+                    </td>
+                    <td>
+<h5>Request</h5>
+<pre>POST http://localhost:8008/user/rahul</pre>
+<h5>Response:</h5>
+<pre>
+{
+    "msg": "User created successfully"
+}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>PUT</code> /answer <br>
+                        Put an answer for a survey question for a particular user
+                    </td>
+                    <td>
+<h5>Request</h5>
+<pre>PUT http://localhost:8008/answer
+{
+    "answer": "55336c91f57a01783c8327aa",
+    "question": "5533871b790d539c4330b6af",
+    "username": "rahul"
+}
+Content-Type: application/json   
+</pre>
+<h5>Response</h5>
+<pre>
+{
+    "mgs": "Answer added/updated successfully"
+}
+</pre>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>GET</code> /matches <br>
+                        Find all the matched users for a particular user with the match count
+                    </td>
+                    <td>
+<h5>Request</h5>
+<pre>GET http://localhost:8008/matches/rahul</pre>
+<h5>Response</h5>
+<pre>
+{
+    "pooja": 1,
+    "joe": 2,
+    "will": 5
+}
+</pre>  
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+
+</body>
+</html>

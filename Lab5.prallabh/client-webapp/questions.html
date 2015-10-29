@@ -1,0 +1,104 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="custom.css">
+</head>
+<body>
+		
+    <div class="container">
+        <div class="jumbotron">
+            <h2 id="questionHeader"></h2>
+            <div id="radioDiv"></div>
+        </div>
+        <button class="btn btn-primary btn-lg" id="btnPrev" onclick="gotoQuestion('Prev')">PREV</button>
+        <button class="btn btn-primary btn-lg" id="btnNext" onclick="gotoQuestion('Next')">NEXT</button>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+
+        var dataPrev, dataNext;
+
+        $(document).ready(function() {
+            qid = getParameterByName("qurl");
+            user = getParameterByName("user");
+
+            console.log("qurl is " + qid);
+
+            //var questionUrl = qid+"?username="+user;
+            var questionUrl = qid;
+            console.log("questionUrl: " + questionUrl);
+            $.get(questionUrl, function(data) {
+                console.log(data);
+                $("#questionHeader").html(data.question.title);
+                //for each option, create a new input radio - same name, different value
+                var optionsHtml = "";
+                $.each(data.question.options, function(idx, obj) {
+
+                    if (data.question.answer != null && data.question.answer.option == obj._id) {
+                        optionsHtml += "<input type='radio' name='qOptions' value='" + obj._id + "' id = '" + obj._id + "' checked>" + obj.title + "</input><br/>";
+                    } else {
+                        optionsHtml += "<input type='radio' name='qOptions' value='" + obj._id + "' id = '" + obj._id + "'>" + obj.title + "</input><br/>";
+                    }
+                });
+                $("#radioDiv").html(optionsHtml);
+
+                quesId = data.question._id;
+                dataPrev = data.prev;
+                dataNext = data.next;
+
+                if (data.prev == null) {
+                    $("#btnPrev").hide();
+                }
+
+            });
+        });
+
+        function getParameterByName(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
+        function navigateQuestion(direction) {
+            var url = "./index.html";
+            var newUrlBase = "./questions.html?user=" + user + "&qurl=";
+            if (direction == 'Prev') {
+                window.location.replace(newUrlBase + dataPrev);
+            } else {
+                if (dataNext == null) {
+                    alert("You have completed the survey!");
+                    window.location.replace(url);
+                } else {
+                    window.location.replace(newUrlBase + dataNext);
+                }
+            }
+        };
+
+        function gotoQuestion(direction) {
+            var url = "http://localhost:8008/answer";
+            var selectedRadio = $('input[name=qOptions]:checked').val();
+            console.log("selectedRadio: ", selectedRadio);
+            if (selectedRadio == null) {
+                navigateQuestion(direction);
+            }
+            user = getParameterByName("user");
+            $.ajax({
+                type: 'PUT',
+                url: url,
+                data: {
+                    "answer": selectedRadio,
+                    "question": quesId,
+                    "username": user
+                },
+                success: function(xhr) {
+                    navigateQuestion(direction);
+                }
+            });
+        };
+    </script>
+</body>
+</html>
